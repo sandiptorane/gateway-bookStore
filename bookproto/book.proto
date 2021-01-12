@@ -1,0 +1,106 @@
+syntax="proto3";
+
+package books;
+
+//import google api annotation
+import "google/api/annotations.proto";
+
+option go_package = "gateway-bookstore/bookproto;books";
+
+
+//Book details
+message Book{
+  int32 id =1;
+  string title=2;
+  string author=3;
+  string content =4;
+}
+
+
+//embed book to AddBookRequest to add book to bookStore
+message AddBookRequest{
+  Book book =1;  //book id is blank
+}
+
+message AddBookResponse{
+  Book book=1;   //book id is filled in
+}
+
+
+//request for list books
+message ListBookRequest{}
+
+//response for list books
+message ListBookResponse{
+  repeated Book books =1;
+}
+
+//request book to read with input book id
+message ReadBookRequest{
+  int32 id =1;
+}
+
+message ReadBookResponse{
+  Book book =1;
+}
+
+//UpdateBookRequest contains book details to update
+message UpdateBookRequest{
+  Book book =1;
+}
+
+//UpdateBookResponse contains updated book's details
+message UpdateBookResponse{
+  Book book=1;
+}
+
+//DeleteBookRequest store book id to delete book
+message DeleteBookRequest{
+  int32 id = 1;
+}
+
+
+//DeleteBookResponse contains deleted book result as true or false
+message DeleteBookResponse{
+  bool success = 1;
+}
+
+service BookService{
+  //addBook to bookStore and returns added book response
+  rpc addBook(AddBookRequest) returns (AddBookResponse){
+    option (google.api.http) ={
+      post :"/bookstore/service"
+      body : "*"
+    };
+  }
+
+  //ReadBook get ReadBookRequest which contains book id to read
+  // and return book through ReadBookResponse
+  rpc readBook(ReadBookRequest)returns (ReadBookResponse){
+    option (google.api.http) = {
+        get : "/bookstore/service/{id}"
+    };
+  }
+
+  //UpdateBook get UpdateBookRequest and return Updated book through UpdateBookResponse
+  rpc updateBook(UpdateBookRequest)returns(UpdateBookResponse){
+    option (google.api.http) ={
+      put :"/bookstore/service"
+      body : "*"
+    };
+  }
+
+  //DeleteBook takes book id to delete and return boolean success value through DeleteBookResponse
+  rpc deleteBook(DeleteBookRequest)returns(DeleteBookResponse){
+    option (google.api.http) ={
+      post : "/bookstore/service/{id}"
+    };
+  }
+
+  //ListBooks returns all books from bookStore
+  rpc listBooks(ListBookRequest) returns (ListBookResponse){
+    option (google.api.http)={
+      get: "/bookstore/service"
+    };
+  }
+}
